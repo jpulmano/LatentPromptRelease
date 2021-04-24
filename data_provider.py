@@ -63,7 +63,7 @@ def generate_data(verbose=True, return_indices=False):
 	
 		# extracting all the files
 		print('Extracting all the files now...')
-		zip.extractall()
+		zip.extractall('Data/')
 		print('Done!')
 
 	features = []
@@ -88,7 +88,7 @@ def generate_data(verbose=True, return_indices=False):
 	for i in strat_participants:
 		try:
 	
-			utterances = list(csv.reader(open('{}{}_TRANSCRIPT.csv'.format(path_to_data, i), 'r'), delimiter='\t'))
+			utterances = list(csv.reader(open('{}cos498_transcripts/{}_TRANSCRIPT.csv'.format(path_to_data, i), 'r'), delimiter='\t'))
 		except IOError as e:
 			if verbose:
 				print(e)
@@ -148,9 +148,9 @@ def generate_data(verbose=True, return_indices=False):
 		print('num qa pairs: {}'.format(len(qa_pairs)))
 
 	# Retrieve labels
-	dev_labels = list(csv.reader(open('Data/dev_split_Depression_AVEC2017.csv', 'r'), delimiter=','))
-	train_labels = list(csv.reader(open('Data/train_split_Depression_AVEC2017.csv', 'r'), delimiter=','))
-	additional_labels = list(csv.reader(open('Data/full_test_split.csv', 'r'), delimiter=','))
+	dev_labels = list(csv.reader(open('Data/cos498_transcripts/dev_split_Depression_AVEC2017.csv', 'r'), delimiter=','))
+	train_labels = list(csv.reader(open('Data/cos498_transcripts/train_split_Depression_AVEC2017.csv', 'r'), delimiter=','))
+	additional_labels = list(csv.reader(open('Data/cos498_transcripts/full_test_split.csv', 'r'), delimiter=','))
 
 	all_labelsets = dev_labels[1:]
 	all_labelsets.extend(train_labels[1:])
