@@ -3,7 +3,8 @@ import numpy as np
 import re
 from sklearn.model_selection import train_test_split
 
-
+# Added
+from zipfile import ZipFile
 
 def shuffle_stratified_split(features, labels, train_size, dev_size, seed):
 	traindev_indices, test_indices, y_traindev, y_test = train_test_split(
@@ -55,6 +56,16 @@ def convert_to_one_hot(labels):
 def generate_data(verbose=True, return_indices=False):
 	path_to_data = "Data/"
 
+	# opening the zip file in READ mode
+	with ZipFile('{}transcripts.zip'.format(path_to_data), 'r') as zip:
+		# printing all the contents of the zip file
+		zip.printdir()
+	
+		# extracting all the files
+		print('Extracting all the files now...')
+		zip.extractall()
+		print('Done!')
+
 	features = []
 
 	spkr_idx = 2
@@ -71,13 +82,12 @@ def generate_data(verbose=True, return_indices=False):
 	
 	set_file = open('Data/participant_indices.txt', 'r')
 	
-        
-        
 	strat_participants = [int(s) for s in set_file.readlines()[0].split(',')]    
 	print(len(strat_participants))
 	
 	for i in strat_participants:
 		try:
+	
 			utterances = list(csv.reader(open('{}{}_TRANSCRIPT.csv'.format(path_to_data, i), 'r'), delimiter='\t'))
 		except IOError as e:
 			if verbose:
