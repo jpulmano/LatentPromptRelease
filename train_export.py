@@ -160,6 +160,8 @@ def train():
 	print("Writing to {}\n".format(out_dir))
 
 
+	print('Evaluating every: ', FLAGS.evaluate_every * batches_per_epoch)
+
 	#Get random splits
 	random.seed(7)
 	split_seeds = [random.randint(1, 100000) for _ in range(FLAGS.num_tests)]
@@ -300,7 +302,7 @@ def train():
 
 					# early stop time vessel
 					batches_per_epoch = int((len(train_indices)-1)/FLAGS.batch_size) + 1
-					if current_step % (FLAGS.evaluate_every * batches_per_epoch)  == 0:
+					if current_step % (FLAGS.evaluate_every * batches_per_epoch) == 0:
 						current_epoch = int(current_step / batches_per_epoch)
 						current_performance = get_early_stop_performance()
 
