@@ -24,6 +24,8 @@ import math
 from enum import Enum
 from exclude_question_set import exclude_questions_from_set
 
+import wandb
+
 class SetTypes(Enum):
 	Train = 1
 	Dev = 2
@@ -56,9 +58,7 @@ tf.flags.DEFINE_float('entropy_coefficient', 0.1, 'Test')
 tf.flags.DEFINE_float('learning_rate', 1e-3, 'Test')
 
 tf.flags.DEFINE_integer("conversation_length", 100, "Max number of turns in a conversation")
-tf.flags.DEFINE_integer("embedding_size", 100, "Number of training epochs (default: 200)")
-
-
+tf.flags.DEFINE_integer("embedding_size", 100, "Number of training epochs (default: 200)") # bruh
 
 
 FLAGS = tf.flags.FLAGS
@@ -119,6 +119,22 @@ def get_model(model_id):
 
 
 def train():
+
+	# wandb initialization 
+	config = {
+		"model": FLAGS.model,
+		"train_size": FLAGS.train_size,
+		"num_tests": FLAGS.num_tests,
+		"num_epochs": FLAGS.num_epochs,
+		"train_size": FLAGS.train_size,
+		"dev_size": FLAGS.dev_size,
+		"batch_size": FLAGS.batch_size
+	}
+
+	wandb.init(project="LatentPromptAnalysis", config=config)
+	
+
+
 	timestamp = str(int(time.time()))
 	examples, labels, refs = data_provider.generate_data(verbose=True, return_indices=True)	
 
@@ -147,8 +163,7 @@ def train():
 
 	splits_file = open('splits_file.csv', 'w')
 	for test_num in range(FLAGS.num_tests):
-
-
+		
 		time_vessel_out_dir = os.path.join(out_dir, 'time_vessels', str(test_num))
 		if not os.path.exists(time_vessel_out_dir):
 			os.makedirs(time_vessel_out_dir)
@@ -239,6 +254,8 @@ def train():
 
 				batches = data_provider.get_batches(train_indices, FLAGS.batch_size, FLAGS.num_epochs, shuffle=True)
 				for batch_indices in batches:
+
+					start = time.time()
 					prompt_features_batch = prompt_features[batch_indices]
 					response_features_batch = response_features[batch_indices]
 					masks_batch = masks[batch_indices]
@@ -264,9 +281,17 @@ def train():
 					
 					current_step = tf.train.global_step(sess, global_step)
 
-					#log training step
+					# log training step
 					time_str = datetime.datetime.now().isoformat()
-					print("{}: step {}, loss {:g}, acc {:g}".format(test_num, step, loss, accuracy))
+					end = time.time()
+					print("{}: step {}, loss {:g}, acc {:g} duration {}".format(test_num, step, loss, accuracy, end-start))
+
+					# wandb logging
+					wandb.log({
+						'step': step,
+						'loss': loss,
+						'accuracy': accuracy,
+					})
 
 
 					# early stop time vessel

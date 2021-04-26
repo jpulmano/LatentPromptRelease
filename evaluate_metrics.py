@@ -3,6 +3,13 @@ import sys
 from sklearn.metrics import f1_score, accuracy_score
 from statistics import mean, stdev, median
 
+import wandb
+
+wandb.init(project="LatentPromptAnalysis-Metrics")
+
+wandb.log({
+	'time_vessels_path': time_vessels_path
+})
 
 if len(sys.argv) < 4:
 	print('use like: evaluate_metrics.py <path/to/time_vessels> <num_test> <predictions_file>')
@@ -33,6 +40,18 @@ for test_num in range(num_tests):
 print('F1 pos: {} ({}) : {}'.format(mean(f1_positives), stdev(f1_positives), median(f1_positives)))
 print('F1 neg: {} ({}) : {}'.format(mean(f1_negatives), stdev(f1_negatives), median(f1_negatives)))
 print('Accuracy: {} ({}) : {}'.format(mean(accuracies), stdev(accuracies), median(accuracies)))
+
+wandb.log({
+	'F1_pos_mean': mean(f1_positives),
+	'F1_pos_stddev': stdev(f1_positives),
+	'F1_pos_median': median(f1_positives),
+	'F1_neg_mean': mean(f1_negatives),
+	'F1_neg_stddev': stdev(f1_negatives),
+	'F1_neg_median': median(ff1_negatives),
+	'Acc_mean': mean(accuracies),
+	'Acc_stddev': stdev(accuracies),
+	'Acc_median': median(accuracies),
+})
 
 
 
