@@ -255,7 +255,7 @@ def train():
 
 
 				batches = data_provider.get_batches(train_indices, FLAGS.batch_size, FLAGS.num_epochs, shuffle=True)
-				for batch_indices in batches:
+				for i, batch_indices in enumerate(batches):
 
 					start = time.time()
 					prompt_features_batch = prompt_features[batch_indices]
@@ -299,8 +299,9 @@ def train():
 
 					# early stop time vessel
 					batches_per_epoch = int((len(train_indices)-1)/FLAGS.batch_size) + 1
-					print('Evaluating every: ', FLAGS.evaluate_every * batches_per_epoch)
-					
+					if i == 0:
+						print('Evaluating every: ', FLAGS.evaluate_every * batches_per_epoch)
+
 					if current_step % (FLAGS.evaluate_every * batches_per_epoch) == 0:
 						current_epoch = int(current_step / batches_per_epoch)
 						current_performance = get_early_stop_performance()

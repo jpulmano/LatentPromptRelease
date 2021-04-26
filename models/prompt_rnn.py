@@ -68,8 +68,10 @@ class RNN(object):
             # loop through every prompt/response pair
             
             # Initialize LSTM (TODO: move this up later)
-            self.LSTM = keras.Sequential()
-            self.LSTM.add(layers.LSTM(2 * embedding_size))
+
+            # self.LSTM = keras.Sequential()
+            # self.LSTM.add(layers.LSTM(2 * embedding_size))
+            self.LSTM = tf.keras.layers.LSTM(2 * embedding_size)
 
             channel_evidence = []
             for channel in range(num_channels):
