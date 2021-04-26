@@ -56,7 +56,7 @@ class RNN(object):
             # Specifically for BERT (score of each of K prompt categories on all h vectors) 
             self.usefulness = tf.clip_by_value(self.usefulness, tf.constant(1e-15), tf.constant(1.0))
 
-            usefulness_dropout = tf.nn.dropout(self.usefulness, keep_prob=1) # (batch x max_conversation_length x channel_number)
+            usefulness_dropout = tf.nn.dropout(self.usefulness, keep_prob=1.0) # (batch x max_conversation_length x channel_number)
 
             # h - category membership
             # r - response vectors
@@ -71,7 +71,7 @@ class RNN(object):
 
             # self.LSTM = keras.Sequential()
             # self.LSTM.add(layers.LSTM(2 * embedding_size))
-            self.LSTM = tf.keras.layers.LSTM(2 * embedding_size)
+            self.LSTM = tf.keras.layers.LSTM(2 * embedding_size, dropout = 0.2)
 
             channel_evidence = []
             for channel in range(num_channels):
