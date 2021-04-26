@@ -26,6 +26,9 @@ from exclude_question_set import exclude_questions_from_set
 
 import wandb
 
+from sklearn.metrics import f1_score, accuracy_score
+from statistics import mean, stdev, median
+
 class SetTypes(Enum):
 	Train = 1
 	Dev = 2
@@ -304,6 +307,7 @@ def train():
 
 						with open(os.path.join(time_vessel_out_dir, 'dev_f1_tracker.csv'), 'a') as dev_f1_tracker:
 							dev_f1_tracker.write('{}\n'.format(current_performance))
+							wandb.log({'dev_f1_tracker': current_performance})
 
 						if current_performance > early_stop_f1:
 							early_stop_f1 = current_performance		
@@ -318,9 +322,7 @@ def train():
 					fnm = os.path.join(time_vessel_out_dir, 'saliences{}.csv'.format(test_num))
 					open(fnm, 'w').close()
 
-
-
-
+		# Save after every epoch
 		save_time_vessel(time_vessel, test_num, time_vessel_out_dir)
 	print('Wrote everything to {}'.format(out_dir))
 
@@ -373,7 +375,43 @@ def save_time_vessel(time_vessel, test_num, out_dir):
 
 		quality = f1_score(y_true=quality_true, y_pred=quality_predictions)
 		vessel_file.write('quality: {}\n'.format(quality))
+	
+	# Added step: print/log dev/test performance
+	f1_positives = []
+	f1_negatives = []
+	accuracies = []
 
+	with open(os.path.join(out_dir, 'dev_predictions.csv')) as test_file:
+		lines = test_file.readlines()
+		labels = [[int(p) for p in line.split(',')] for line in lines]
+
+	labels_true = [label[0] for label in labels]
+	labels_pred = [label[1] for label in labels]
+
+	f1_positives.append(f1_score(y_true=labels_true, y_pred=labels_pred))
+	f1_negatives.append(f1_score(y_true=labels_true, y_pred=labels_pred, pos_label=0))
+	accuracies.append(accuracy_score(y_true=labels_true, y_pred=labels_pred))
+
+	print('Dev')
+	print(f1_positives, f1_negatives, accuracies)
+
+	f1_positives = []
+	f1_negatives = []
+	accuracies = []
+
+	with open(os.path.join(out_dir, 'test_predictions.csv')) as test_file:
+		lines = test_file.readlines()
+		labels = [[int(p) for p in line.split(',')] for line in lines]
+
+	labels_true = [label[0] for label in labels]
+	labels_pred = [label[1] for label in labels]
+
+	f1_positives.append(f1_score(y_true=labels_true, y_pred=labels_pred))
+	f1_negatives.append(f1_score(y_true=labels_true, y_pred=labels_pred, pos_label=0))
+	accuracies.append(accuracy_score(y_true=labels_true, y_pred=labels_pred))
+
+	print('Test')
+	print(f1_positives, f1_negatives, accuracies)
 
 
 def main(argv=None):     
