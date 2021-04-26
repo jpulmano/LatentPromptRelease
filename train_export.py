@@ -163,7 +163,7 @@ def train():
 
 	splits_file = open('splits_file.csv', 'w')
 	for test_num in range(FLAGS.num_tests):
-		
+
 		time_vessel_out_dir = os.path.join(out_dir, 'time_vessels', str(test_num))
 		if not os.path.exists(time_vessel_out_dir):
 			os.makedirs(time_vessel_out_dir)
@@ -291,6 +291,7 @@ def train():
 						'step': step,
 						'loss': loss,
 						'accuracy': accuracy,
+						'step_duration': end-start
 					})
 
 
