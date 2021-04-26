@@ -11,7 +11,7 @@ from models.prompt_latent_type_concat_latent_entropy import PromptLatentTypeConc
 from models.prompt_latent_type_concatv2_latent_entropy import PromptLatentTypeConcatModelV2LatentEntropy
 
 # Ours
-from models.prompt_baseline import RNN
+from models.prompt_rnn import RNN
 
 from sklearn.metrics import f1_score
 import random
