@@ -2,6 +2,9 @@ import tensorflow as tf
 import numpy as np
 import sys
 
+from tensorflow import keras
+from tensorflow.keras import layers
+
 
 class RNN(object):
     """
