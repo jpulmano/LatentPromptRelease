@@ -36,20 +36,21 @@ class PromptResponseBaseline(object):
 				# Padding?
 				self.normalizer = (1.0 / tf.cast(tf.reduce_sum(self.input_masks, axis=1),dtype=tf.float32))[:, tf.newaxis] 
 				
+				# 
 				print('\n================Using baseline================\n')
 				self.evidence = self.normalizer * tf.concat([
 					tf.reduce_sum(self.input_prompts, axis=1),
 					tf.reduce_sum(self.input_responses, axis=1)
 				], axis=1)
 
-
+				# Calculating 
 				self.logits = tf.nn.dropout(tf.layers.dense(
 					inputs = self.evidence,
 					kernel_initializer=tf.contrib.layers.xavier_initializer(seed=45),
 					units = 2,
 					name="logits_layer"), keep_prob=1)
 
-
+				# Getting most probable 
 				self.predictions = tf.argmax(self.logits, 1, name="predictions")
 
 			# Calculate mean cross-entropy loss

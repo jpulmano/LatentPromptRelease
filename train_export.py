@@ -9,6 +9,10 @@ from models.prompt_latent_type_concatv2 import PromptLatentTypeConcatModelV2
 from models.prompt_latent_type_latent_entropy import PromptLatentTypeModelLatentEntropy
 from models.prompt_latent_type_concat_latent_entropy import PromptLatentTypeConcatModelLatentEntropy
 from models.prompt_latent_type_concatv2_latent_entropy import PromptLatentTypeConcatModelV2LatentEntropy
+
+# Ours
+from models.prompt_baseline import RNN
+
 from sklearn.metrics import f1_score
 import random
 import numpy as np
@@ -94,6 +98,14 @@ def get_model(model_id):
 		)
 	elif model_id == "prompt_latent_type_concatv2_latent_entropy":
 		attn = PromptLatentTypeConcatModelV2LatentEntropy(
+			conversation_length=100,
+			embedding_size=FLAGS.embedding_size,
+			num_channels=FLAGS.prompt_latent_type__num_channels,
+			num_hidden_layers=FLAGS.promptresponse_complex__num_hidden_layers,
+			regularization_coefficient=FLAGS.entropy_coefficient
+		)
+	elif model_id == "rnn":
+		attn = RNN(
 			conversation_length=100,
 			embedding_size=FLAGS.embedding_size,
 			num_channels=FLAGS.prompt_latent_type__num_channels,

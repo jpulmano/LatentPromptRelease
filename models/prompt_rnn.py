@@ -3,7 +3,7 @@ import numpy as np
 import sys
 
 
-class PromptLatentTypeConcatModelLatentEntropy(object):
+class RNN(object):
     """
     A CNN for text classification.
     Uses an embedding layer, followed by a convolutional, max-pooling and softmax layer.
@@ -27,6 +27,7 @@ class PromptLatentTypeConcatModelLatentEntropy(object):
         self.input_masks = tf.placeholder(tf.float32, [None, conversation_length])
         self.input_y = tf.placeholder(tf.float32, [None, num_classes], name="input_y")
         self.dropout_keep = tf.placeholder(tf.float32, name="dropout_keep")        
+
 
         # Keeping track of l2 regularization loss (optional)
         l2_loss = tf.constant(0.0)
@@ -54,22 +55,29 @@ class PromptLatentTypeConcatModelLatentEntropy(object):
 
             usefulness_dropout = tf.nn.dropout(self.usefulness, keep_prob=1) # (batch x max_conversation_length x channel_number)
 
-            # Produces response aggregations
+            # h - category membership
+            # r - response vectors
+            # at every step, compute h * r (category membership * response vector)
+            # feed h * r into RNN
+            # once input is exhausted, take final hidden layer and throw it into a decision layer
+
+            # loop through every channel
+            # loop through every prompt/response pair
+            
+            # Initialize LSTM (TODO: move this up later)
+            self.LSTM = keras.Sequential()
+            self.LSTM.add(layers.LSTM(2 * embedding_size))
+
             channel_evidence = []
             for channel in range(num_channels):
 
-                # For every channel, sum over all h vectors in one specific channel / prompt category
-                # Normalizer Z_i to prevent varying signal strength
-                # input_masks zero out vectors beyond length of conversation_length
-                norm = 1.0 / (tf.reduce_sum(usefulness_dropout[:, :, channel, tf.newaxis] * tf.cast(self.input_masks[:, :, tf.newaxis], dtype=tf.float32), axis=1))
-                
-                # Multiples h vectors by the embeddings to produce terms of weighted sum
-                r_evidence = norm * tf.reduce_sum(
-                    usefulness_dropout[:, :, channel, tf.newaxis]* tf.concat([self.input_prompts, self.input_responses], axis=2), 
-                    axis=1
-                )
-                
-                channel_evidence.append(r_evidence)
+                # Calculate h * r
+                h_r = usefulness_dropout[:, :, channel, tf.newaxis] * tf.concat([self.input_prompts, self.input_responses], axis=2)
+
+                # Get last hidden state from LSTM
+                output = self.LSTM(h_r)
+
+                channel_evidence.append(output)
 
             # Create a huge vector out of the "Category-Aware Response Aggregations" to pass into a decision layer
             combined_evidence = tf.concat(axis=1, values=channel_evidence)

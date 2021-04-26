@@ -61,7 +61,12 @@ class PromptLatentTypeConcatModelLatentEntropy(object):
                 # For every channel, sum over all h vectors in one specific channel / prompt category
                 # Normalizer Z_i to prevent varying signal strength
                 # input_masks zero out vectors beyond length of conversation_length
-                norm = 1.0 / (tf.reduce_sum(usefulness_dropout[:, :, channel, tf.newaxis] * tf.cast(self.input_masks[:, :, tf.newaxis], dtype=tf.float32), axis=1))
+                norm = 1.0 / (
+                    tf.reduce_sum(
+                        usefulness_dropout[:, :, channel, tf.newaxis] * tf.cast(self.input_masks[:, :, tf.newaxis], dtype=tf.float32), 
+                        axis=1
+                    )
+                )
                 
                 # Multiples h vectors by the embeddings to produce terms of weighted sum
                 r_evidence = norm * tf.reduce_sum(
