@@ -39,9 +39,8 @@ def get_features(examples, conversation_length, embedding_size, verbose=True):
 	#return np.zeros([len(examples), max_conversation_length, embedding_size]), np.zeros([len(examples), max_conversation_length, embedding_size]), np.zeros([len(examples), max_conversation_length])
 
 	for c_i, conversation in enumerate(examples):
-		if verbose:
+		if verbose and c_i % 50 == 0:
 			print('Getting features for example {}'.format(c_i))
-
 		
 		prompt_features.append(
 			np.stack([get_vector_representation(conversation[i][0], vocab) if i < len(conversation) else np.zeros(embedding_size) 
@@ -55,9 +54,6 @@ def get_features(examples, conversation_length, embedding_size, verbose=True):
 		masks.append(
 			np.array([1 if i < len(conversation) else 0 for i in range(max_conversation_length)])
 		)
-		
-
-	
 
 	return np.stack(prompt_features), np.stack(response_features), np.stack(masks)
 

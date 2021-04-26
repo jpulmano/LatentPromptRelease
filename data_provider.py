@@ -87,7 +87,6 @@ def generate_data(verbose=True, return_indices=False):
 	
 	for i in strat_participants:
 		try:
-	
 			utterances = list(csv.reader(open('{}cos498_transcripts/{}_TRANSCRIPT.csv'.format(path_to_data, i), 'r'), delimiter='\t'))
 		except IOError as e:
 			if verbose:
