@@ -36,15 +36,14 @@ class PromptBaseline(object):
 				print('\n================Using baseline================\n')
 				self.evidence = self.normalizer * tf.reduce_sum(self.input_prompts, axis=1)
 
-
-
+				# Pass through a dense layer and a dropout layer
 				self.logits = tf.nn.dropout(tf.layers.dense(
 					inputs = self.evidence,					
 					kernel_initializer=tf.contrib.layers.xavier_initializer(seed=42),
 					units = 2,
 					name="logits_layer"), keep_prob=1)
 
-
+				# Return predictions
 				self.predictions = tf.argmax(self.logits, 1, name="predictions")
 
 			# Calculate mean cross-entropy loss

@@ -29,8 +29,11 @@ class PromptResponseBaseline(object):
 		
 		with tf.variable_scope("classifier"):
 			with tf.variable_scope("output"):
+
+				# First axis of input prompts is batch size
 				self.batch_size = tf.shape(self.input_prompts)[0]
 
+				# Padding?
 				self.normalizer = (1.0 / tf.cast(tf.reduce_sum(self.input_masks, axis=1),dtype=tf.float32))[:, tf.newaxis] 
 				
 				print('\n================Using baseline================\n')
