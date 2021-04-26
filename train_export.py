@@ -304,10 +304,10 @@ def train():
 						current_epoch = int(current_step / batches_per_epoch)
 						current_performance = get_early_stop_performance()
 
-
 						with open(os.path.join(time_vessel_out_dir, 'dev_f1_tracker.csv'), 'a') as dev_f1_tracker:
 							dev_f1_tracker.write('{}\n'.format(current_performance))
 							wandb.log({'dev_f1_tracker': current_performance})
+							print('Saved dev_f1_tracker: ', current_performance)
 
 						if current_performance > early_stop_f1:
 							early_stop_f1 = current_performance		
