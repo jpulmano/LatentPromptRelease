@@ -82,10 +82,14 @@ class BidirectionalRNN(object):
                 # Get last hidden state from LSTM
                 output = self.LSTM(h_r)
 
+                if channel == 0:
+                    print('LSTM output shape: ', output.shape)
+
                 channel_evidence.append(output)
 
             # Create a huge vector out of the "Category-Aware Response Aggregations" to pass into a decision layer
             combined_evidence = tf.concat(axis=1, values=channel_evidence)
+            print('Combined evidence shape: ', combined_evidence.shape)
 
             # Prompts and responses [batch x (2 * embedding_size * prompt categories)]
             combined_evidence = tf.reshape(combined_evidence, [self.batch_size, embedding_size * 2 * num_channels])
