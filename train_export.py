@@ -64,6 +64,7 @@ tf.flags.DEFINE_float('learning_rate', 1e-3, 'Test')
 tf.flags.DEFINE_integer("conversation_length", 100, "Max number of turns in a conversation")
 tf.flags.DEFINE_integer("embedding_size", 100, "Number of training epochs (default: 200)") # bruh
 
+tf.flags.DEFINE_boolean("init_wandb", True, "Allow wandb logging") 
 
 FLAGS = tf.flags.FLAGS
 
@@ -133,20 +134,19 @@ def get_model(model_id):
 def train():
 
 	# wandb initialization 
-	config = {
-		"model": FLAGS.model,
-		"train_size": FLAGS.train_size,
-		"num_tests": FLAGS.num_tests,
-		"num_epochs": FLAGS.num_epochs,
-		"train_size": FLAGS.train_size,
-		"dev_size": FLAGS.dev_size,
-		"batch_size": FLAGS.batch_size
-	}
+	if FLAGS.init_wandb:
+		config = {
+			"model": FLAGS.model,
+			"train_size": FLAGS.train_size,
+			"num_tests": FLAGS.num_tests,
+			"num_epochs": FLAGS.num_epochs,
+			"train_size": FLAGS.train_size,
+			"dev_size": FLAGS.dev_size,
+			"batch_size": FLAGS.batch_size
+		}
 
-	wandb.init(project="LatentPromptAnalysis", config=config)
+		wandb.init(project="LatentPromptAnalysis", config=config)
 	
-
-
 	timestamp = str(int(time.time()))
 	examples, labels, refs = data_provider.generate_data(verbose=True, return_indices=True)	
 
@@ -298,12 +298,13 @@ def train():
 					print("{}: step {}, loss {:g}, acc {:g} duration {}".format(test_num, step, loss, accuracy, end-start))
 
 					# wandb logging
-					wandb.log({
-						'step': step,
-						'loss': loss,
-						'accuracy': accuracy,
-						'step_duration': end-start
-					})
+					if FLAGS.init_wandb:
+						wandb.log({
+							'step': step,
+							'loss': loss,
+							'accuracy': accuracy,
+							'step_duration': end-start
+						})
 
 
 					# early stop time vessel
@@ -317,7 +318,8 @@ def train():
 
 						with open(os.path.join(time_vessel_out_dir, 'dev_f1_tracker.csv'), 'a') as dev_f1_tracker:
 							dev_f1_tracker.write('{}\n'.format(current_performance))
-							wandb.log({'dev_f1_tracker': current_performance})
+							if FLAGS.init_wandb:
+								wandb.log({'dev_f1_tracker': current_performance})
 							print('Saved dev_f1_tracker: ', current_performance)
 
 						if current_performance > early_stop_f1:
@@ -386,6 +388,8 @@ def save_time_vessel(time_vessel, test_num, out_dir):
 
 		quality = f1_score(y_true=quality_true, y_pred=quality_predictions)
 		vessel_file.write('quality: {}\n'.format(quality))
+
+	# ------------------- Dev Logging -----------------------
 	
 	# Added step: print/log dev/test performance
 	f1_positives = []
@@ -406,6 +410,15 @@ def save_time_vessel(time_vessel, test_num, out_dir):
 	print('Dev')
 	print(f1_positives, f1_negatives, accuracies)
 
+	if FLAGS.init_wandb:
+		wandb.log({
+			'dev_f1_positives': f1_positives[0],
+			'dev_f1_negatives': f1_negatives[0],
+			'dev_accuracies': accuracies[0]
+		})
+
+	# ------------------- Test Logging -----------------------
+
 	f1_positives = []
 	f1_negatives = []
 	accuracies = []
@@ -423,6 +436,13 @@ def save_time_vessel(time_vessel, test_num, out_dir):
 
 	print('Test')
 	print(f1_positives, f1_negatives, accuracies)
+
+	if FLAGS.init_wandb:
+		wandb.log({
+			'test_f1_positives': f1_positives[0],
+			'test_f1_negatives': f1_negatives[0],
+			'test_accuracies': accuracies[0]
+		})
 
 
 def main(argv=None):     
