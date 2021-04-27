@@ -12,6 +12,7 @@ from models.prompt_latent_type_concatv2_latent_entropy import PromptLatentTypeCo
 
 # Ours
 from models.prompt_rnn import RNN
+from models.prompt_bidirectional_rnn import BidirectionalRNN
 
 from sklearn.metrics import f1_score
 import random
@@ -109,6 +110,14 @@ def get_model(model_id):
 		)
 	elif model_id == "rnn":
 		attn = RNN(
+			conversation_length=100,
+			embedding_size=FLAGS.embedding_size,
+			num_channels=FLAGS.prompt_latent_type__num_channels,
+			num_hidden_layers=FLAGS.promptresponse_complex__num_hidden_layers,
+			regularization_coefficient=FLAGS.entropy_coefficient
+		)
+	elif model_id == "bidirectional_rnn":
+		attn = BidirectionalRNN(
 			conversation_length=100,
 			embedding_size=FLAGS.embedding_size,
 			num_channels=FLAGS.prompt_latent_type__num_channels,
