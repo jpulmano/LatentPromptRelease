@@ -18,7 +18,7 @@ class RNN(object):
         num_channels = number of latent categories
     """
     def __init__(
-      self, conversation_length, num_channels, embedding_size, num_hidden_layers, regularization_coefficient):
+      self, conversation_length, num_channels, embedding_size, num_hidden_layers, regularization_coefficient, pos_weight):
 
         num_classes = 2
 
@@ -112,7 +112,7 @@ class RNN(object):
         # Calculate mean cross-entropy loss
         with tf.name_scope("loss"):
             # losses = tf.nn.softmax_cross_entropy_with_logits(logits=self.scores, labels=self.input_y) # Not weighted
-            losses = tf.nn.weighted_cross_entropy_with_logits(self.input_y, self.scores, 1.5)
+            losses = tf.nn.weighted_cross_entropy_with_logits(self.input_y, self.scores, pos_weight)
             
             norm = 1.0 / tf.reduce_sum(tf.reduce_sum(tf.cast(self.input_masks[:, :], dtype=tf.float32), axis=1), axis=0)
             

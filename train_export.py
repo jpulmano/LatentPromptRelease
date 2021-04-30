@@ -64,7 +64,9 @@ tf.flags.DEFINE_float('learning_rate', 1e-3, 'Test')
 tf.flags.DEFINE_integer("conversation_length", 100, "Max number of turns in a conversation")
 tf.flags.DEFINE_integer("embedding_size", 100, "Number of training epochs (default: 200)") # bruh
 
+# New ones
 tf.flags.DEFINE_boolean("init_wandb", True, "Allow wandb logging") 
+tf.flags.DEFINE_float('pos_weight', 1e-3, 'The weight to assign to positive predictions in cross entropy loss')
 
 FLAGS = tf.flags.FLAGS
 
@@ -115,7 +117,8 @@ def get_model(model_id):
 			embedding_size=FLAGS.embedding_size,
 			num_channels=FLAGS.prompt_latent_type__num_channels,
 			num_hidden_layers=FLAGS.promptresponse_complex__num_hidden_layers,
-			regularization_coefficient=FLAGS.entropy_coefficient
+			regularization_coefficient=FLAGS.entropy_coefficient,
+			pos_weight=FLAGS.pos_weight
 		)
 	elif model_id == "bidirectional_rnn":
 		attn = BidirectionalRNN(
@@ -123,7 +126,8 @@ def get_model(model_id):
 			embedding_size=FLAGS.embedding_size,
 			num_channels=FLAGS.prompt_latent_type__num_channels,
 			num_hidden_layers=FLAGS.promptresponse_complex__num_hidden_layers,
-			regularization_coefficient=FLAGS.entropy_coefficient
+			regularization_coefficient=FLAGS.entropy_coefficient,
+			pos_weight=FLAGS.pos_weight
 		)
 	else:
 		print("\nNO SUCH MODEL\n")
@@ -353,7 +357,7 @@ def get_train_summary_op(train_summary_dir, model, grads_and_vars):
 	loss_summary = tf.summary.scalar("batch loss", model.loss)
 	acc_summary = tf.summary.scalar("batch accuracy", model.accuracy)
 	train_summary_op = tf.summary.merge([loss_summary, acc_summary, grad_summaries_merged])
-
+ 
 	return train_summary_op
 
 
