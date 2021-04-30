@@ -114,7 +114,7 @@ class BidirectionalRNN(object):
                
         # Calculate mean cross-entropy loss
         with tf.name_scope("loss"):
-            losses = tf.nn.softmax_cross_entropy_with_logits(logits=self.scores, labels=self.input_y)
+            losses = tf.nn.weighted_cross_entropy_with_logits(logits=self.scores, labels=self.input_y, pos_weight=1.5)
             
             norm = 1.0 / tf.reduce_sum(tf.reduce_sum(tf.cast(self.input_masks[:, :], dtype=tf.float32), axis=1), axis=0)
             
