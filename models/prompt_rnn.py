@@ -18,7 +18,8 @@ class RNN(object):
         num_channels = number of latent categories
     """
     def __init__(
-      self, conversation_length, num_channels, embedding_size, num_hidden_layers, regularization_coefficient, pos_weight):
+      self, conversation_length, num_channels, embedding_size, num_hidden_layers, 
+      regularization_coefficient, pos_weight, rnn_type):
 
         num_classes = 2
 
@@ -67,11 +68,11 @@ class RNN(object):
             # loop through every channel
             # loop through every prompt/response pair
             
-            # Initialize LSTM (TODO: move this up later)
-
-            # self.LSTM = keras.Sequential()
-            # self.LSTM.add(layers.LSTM(2 * embedding_size))
-            self.LSTM = tf.keras.layers.LSTM(2 * embedding_size, dropout = 0.2)
+            # Initialize LSTM
+            if rnn_type == 'LSTM':
+                self.RNN = tf.keras.layers.LSTM(2 * embedding_size, dropout = 0.2)
+            elif rnn_type == 'GRU':
+                self.RNN = tf.keras.layers.GRU(2 * embedding_size, dropout = 0.2)
 
             channel_evidence = []
             for channel in range(num_channels):
@@ -80,7 +81,7 @@ class RNN(object):
                 h_r = usefulness_dropout[:, :, channel, tf.newaxis] * tf.concat([self.input_prompts, self.input_responses], axis=2)
 
                 # Get last hidden state from LSTM
-                output = self.LSTM(h_r)
+                output = self.RNN(h_r)
 
                 channel_evidence.append(output)
 

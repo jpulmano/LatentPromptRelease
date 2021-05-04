@@ -67,10 +67,9 @@ tf.flags.DEFINE_integer("embedding_size", 100, "Number of training epochs (defau
 # New ones
 tf.flags.DEFINE_boolean("init_wandb", True, "Allow wandb logging") 
 tf.flags.DEFINE_float('pos_weight', 1e-3, 'The weight to assign to positive predictions in cross entropy loss')
+tf.flags.DEFINE_string('rnn_type', 'LSTM', 'Type of the rnn (LSTM / GRU)')
 
 FLAGS = tf.flags.FLAGS
-
-
 
 def get_model(model_id):
 	if model_id == "response_baseline":
@@ -118,7 +117,8 @@ def get_model(model_id):
 			num_channels=FLAGS.prompt_latent_type__num_channels,
 			num_hidden_layers=FLAGS.promptresponse_complex__num_hidden_layers,
 			regularization_coefficient=FLAGS.entropy_coefficient,
-			pos_weight=FLAGS.pos_weight
+			pos_weight=FLAGS.pos_weight,
+			rnn_type=FLAGS.rnn_type
 		)
 	elif model_id == "bidirectional_rnn":
 		attn = BidirectionalRNN(
@@ -127,7 +127,8 @@ def get_model(model_id):
 			num_channels=FLAGS.prompt_latent_type__num_channels,
 			num_hidden_layers=FLAGS.promptresponse_complex__num_hidden_layers,
 			regularization_coefficient=FLAGS.entropy_coefficient,
-			pos_weight=FLAGS.pos_weight
+			pos_weight=FLAGS.pos_weight,
+			rnn_type=FLAGS.rnn_type
 		)
 	else:
 		print("\nNO SUCH MODEL\n")
