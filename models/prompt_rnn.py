@@ -69,10 +69,11 @@ class RNN(object):
             # loop through every prompt/response pair
             
             # Initialize LSTM
-            if rnn_type == 'LSTM':
-                self.RNN = tf.keras.layers.LSTM(2 * embedding_size, dropout = 0.2)
-            elif rnn_type == 'GRU':
-                self.RNN = tf.keras.layers.GRU(2 * embedding_size, dropout = 0.2)
+            # if rnn_type == 'LSTM':
+                # self.RNN = tf.keras.layers.LSTM(2 * embedding_size, dropout = 0.2)
+            # elif rnn_type == 'GRU':
+            
+            self.RNN = tf.keras.layers.GRU(2 * embedding_size, dropout = 0.2)
 
             channel_evidence = []
             for channel in range(num_channels):
@@ -112,8 +113,8 @@ class RNN(object):
                
         # Calculate mean cross-entropy loss
         with tf.name_scope("loss"):
-            # losses = tf.nn.softmax_cross_entropy_with_logits(logits=self.scores, labels=self.input_y) # Not weighted
-            losses = tf.nn.weighted_cross_entropy_with_logits(self.input_y, self.scores, pos_weight)
+            losses = tf.nn.softmax_cross_entropy_with_logits(logits=self.scores, labels=self.input_y) # Not weighted
+            # losses = tf.nn.weighted_cross_entropy_with_logits(self.input_y, self.scores, pos_weight)
             
             norm = 1.0 / tf.reduce_sum(tf.reduce_sum(tf.cast(self.input_masks[:, :], dtype=tf.float32), axis=1), axis=0)
             
